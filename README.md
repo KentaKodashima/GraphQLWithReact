@@ -135,3 +135,45 @@ fragment companyDetails on Company {
   description
 }
 ```
+
+## Mutations
+Mutations are used to change our data in some fashion.
+
+### Defining mutations
+```
+const mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    addUser: {
+      type: UserType,
+      args: {
+        firstName: { type: new GraphQLNonNull(GraphQLString) },
+        age: { type: new GraphQLNonNull(GraphQLInt) },
+        companyId: { type: GraphQLString }
+      },
+      async resolve(parentValue, { firstName, age }) {
+        const response = await axios.post('http://localhost:3000/users/', { firstName, age })
+
+        return response.data
+      }
+    }
+  }
+})
+
+module.exports = new GraphQLSchema({
+  query: RootQuery,
+  mutation
+})
+```
+
+### Using the mutations
+```
+mutation {
+  addUser(firstName: "Stephen", age: 26) {
+    id
+    firstName
+    age
+  }
+}
+```
+
