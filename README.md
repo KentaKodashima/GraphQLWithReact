@@ -183,3 +183,81 @@ mutation {
 3. Bond query + component
 4. Access data
 
+## Using GraphQL Queries in React
+
+### How to make a query 
+
+```
+import gql from 'graphql-tag'
+import { graphql } from 'react-apollo'
+
+...
+
+const query = gql`
+  {
+    songs {
+      id
+      title
+    }
+  }
+`
+
+export default graphql(query)(SongList)
+```
+
+### Query Variables
+Use query variables to communicate data from component to GraphQL queries.
+
+```
+import { graphql } from "react-apollo"
+import gql from 'graphql-tag'
+
+...
+
+onSubmit(event) {
+  event.preventDefault()
+    
+  this.props.mutate({
+    variables: {
+      title: this.state.title
+    }
+  })
+}
+
+...
+
+const mutation = gql`
+  mutation AddSong($title: String) {
+    addSong(title: $title) {
+      title
+    }
+  }
+`
+
+export default graphql(mutation)(SongCreate)
+```
+
+### refetchQueries vs refetch()
+If the query that you are trying to refetch is associated with the component, you can use `this.props.data.refetch()`. Otherwise, you just use `refetchQueries`.
+
+```
+// refetchQueries
+this.props.mutate({
+  variables: { title: this.state.title },
+  refetchQueries: [{ query: fetchSongs }]
+}).then(() => history.push('/'))
+
+// refetch() from apollo
+this.props.mutate({ variables: { id } })
+  .then(() => this.props.data.refetch()) 
+```
+
+### Query with variables
+
+```
+// props is eqaul to the component's props
+// Takes id from the component's props and pass it as a query variable
+export default graphql(fetchSong, {
+  options: props => { return { variables: { id: props.params.id } } }
+})(SongDetail)
+``` 
