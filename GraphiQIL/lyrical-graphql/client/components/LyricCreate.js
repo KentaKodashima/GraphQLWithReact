@@ -41,6 +41,7 @@ const mutation = gql`
       id
       lyrics {
         content
+        id
       }
     }
   }
