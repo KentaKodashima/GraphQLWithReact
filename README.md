@@ -76,6 +76,7 @@ user(id: "1") {
 
 ### Relationships Between Schemas
 UserType has a property called company. The company property has CompanyType and it is resolved by the company's id.
+
 ```
 const UserType = new GraphQLObjectType({
   name: 'User',
@@ -249,7 +250,17 @@ this.props.mutate({
 
 // refetch() from apollo
 this.props.mutate({ variables: { id } })
-  .then(() => this.props.data.refetch()) 
+  .then(() => this.props.data.refetch())
+```
+
+#### Apollo Store (Client)
+Apollo uses this to identify every piece of data. This feature of Apollo allows us to automatically update the UI with a single query.
+[https://www.apollographql.com/docs/react/advanced/caching](https://www.apollographql.com/docs/react/advanced/caching)
+
+```
+const client = new ApolloClient({
+  dataIdFromObject: o => o.id
+})
 ```
 
 ### Query with variables
@@ -261,3 +272,21 @@ export default graphql(fetchSong, {
   options: props => { return { variables: { id: props.params.id } } }
 })(SongDetail)
 ``` 
+### Optimistic Response
+We can define expected result of mutation using `optimisticResponse` in order to speed up the UI updates.
+
+```
+onLike(id, likes) {
+  this.props.mutate({
+    variables: { id },
+    optimisticResponse: {
+      __typename: 'Mutation',
+      likeLyric: {
+        id: id,
+        __typename: 'LyricType',
+        likes: likes + 1
+      }
+    }
+  })
+}
+```
